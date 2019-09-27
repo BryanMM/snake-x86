@@ -2,7 +2,9 @@
 Segunda tarea corta para el curso de Sistemas Operativos.
 
 Requisitos:
+    
     - Instalar nasm
+    
     - Instalar qemu
 
 Indicar el nombre del USB en el Makefile en la variable "USB", el nombre debe tener la estructura 'dev/sXX'.
