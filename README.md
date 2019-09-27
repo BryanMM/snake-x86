@@ -1,10 +1,21 @@
 # snake-x86
 Segunda tarea corta para el curso de Sistemas Operativos.
 
-Require de qemu para poder correrlo desde ubuntu, una vez instalado este software:
+Requisitos:
+    - Instalar nasm
+    - Instalar qemu
 
-> nasm snake.asm -f bin -o snake.bin
+Indicar el nombre del USB en el Makefile en la variable "USB", el nombre debe tener la estructura 'dev/sXX'.
+Para ver el nombre se puede utilizar el siguiente comando:
+> lsblk
 
-y para correrlo 
+Indicar el nombre de la versión de snake que desea ejecutar en el Makefile en la variable "VERSION".
 
-> qemu-system-x86_64 -fda snake.bin
+Para generar los archivos 
+> make build 
+
+Para correr el juego en qemu:
+> make runqemu
+
+Para instalar el juego en el dispositivo USB:
+> make install 
