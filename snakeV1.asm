@@ -39,6 +39,8 @@ game_loop:
 done_clear:
 	mov		al, [last_move]					; no keys, so we use the last one
 update_snakepos:
+	cmp		al, 'r'
+	je		hot_restart
 	cmp		al, 'a'
 	je		left
 	cmp		al, 's'
@@ -47,6 +49,7 @@ update_snakepos:
 	je		right
 	cmp		al, 'w'
 	jne		done_clear
+
 up:
 	dec		byte [snake_y_pos]
 	jmp		move_done					 	; jump away
@@ -225,6 +228,12 @@ game_over:
 	mov		si, retry_msg
 	call	print_string
 
+hot_restart:
+	mov		word [snake_pos], 0x0F0F
+	and		word [snake_body_pos], 0
+	and		word [score], 0
+	mov		byte [last_move], 'd'
+	jmp		game_loop
 wait_for_r:
 	mov		ah, 0x00
 	int		0x16
@@ -318,5 +327,4 @@ snake_pos:
 	snake_x_pos db 0x0F
 	snake_y_pos db 0x0F
     snake_body_pos dw 0x0000
-
 
