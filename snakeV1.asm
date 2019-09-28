@@ -67,17 +67,25 @@ update_body:
 	mov		ax, bx							; save bx into ax for next loop
 	jmp		update_body						; loop
 done_update:
-	cmp		byte [grow_snake_flag], 2 		; snake should grow?
-	jne		add_zero_snake					; if not: jump to add_zero_snake
+	cmp		byte [grow_snake_flag], 1 		; snake should grow?
+	je		update_apple				; if not: jump to add_zero_snake						
+	cmp		byte [grow_snake_flag], 2
+	je		update_lemon
+	jmp		add_zero_snake
+update_apple:
 	mov		word [si], ax					; save the last element at the next position
 	mov		byte [grow_snake_flag], 0 		; disable grow_snake_flag
-	add		si, 2							; increment si by 2
-	cmp		byte [grow_snake_flag], 10
-	jne		add_zero_snake
+	add		si, 2	
+	ret
+update_lemon:
+	mov		word [si], ax
+	add		si, 2
 	mov 	word [si], ax
 	add		si, 2
-	add		si, 2
-	mov 	byte [grow_snake_flag], 0
+	mov		word [si], ax					; save the last element at the next position
+	mov		byte [grow_snake_flag], 0 		; disable grow_snake_flag
+	add		si, 2	
+	ret
 add_zero_snake:
 	mov		word [si], 0x0000
 print_stuff:
@@ -151,10 +159,12 @@ apple_collision:
 	pop		cx								; restore old random into cx
 	mov		dh, cl							; move old value into high bits of new
 	mov		[apple_pos], dx					; save the position of the new random food
-	mov		byte [grow_snake_flag], 2 		; make sure snake grows
+	mov		byte [grow_snake_flag], 1 		; make sure snake grows
 	ret
 lemon_collision:
-	inc		word [score]					; if we were on an apple, increment score by one
+	inc		word [score]					; if we were on an apple, increment score three times
+	inc		word [score]
+	inc		word [score]
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
@@ -163,7 +173,7 @@ lemon_collision:
 	pop		cx								; restore old random into cx
 	mov		dh, cl							; move old value into high bits of new
 	mov		[lemon_pos], dx					; save the position of the new random food
-	mov		byte [grow_snake_flag], 10 		; make sure snake grows
+	mov		byte [grow_snake_flag], 2 		; make sure snake grows
 	ret
 orange_collision:
 	dec		word [score]					; if we were on an apple, increment score by one
@@ -175,7 +185,7 @@ orange_collision:
 	pop		cx								; restore old random into cx
 	mov		dh, cl							; move old value into high bits of new
 	mov		[orange_pos], dx				; save the position of the new random food
-	mov		byte [grow_snake_flag], -1 		; make sure snake grows
+	mov		byte [grow_snake_flag], 3 		; make sure snake grows
 	ret 
 game_loop_continued:
 	mov		cx, 0x0002						; Sleep for 0,15 seconds (cx:dx)
@@ -206,7 +216,7 @@ wait_for_r:
 ; SCREEN FUNCTIONS ------------------------------------------------------------
 clear_screen:
 	mov		ax, 0x0700						; clear entire window (ah 0x07, al 0x00)
-	mov		bh, 0x0C						; light red on black
+	mov		bh, 0xFC						; light red on black
 	xor		cx, cx							; top left = (0,0)
 	mov		dx, 0x1950						; bottom right = (25, 80)
 	int		0x10
@@ -267,7 +277,6 @@ rand:										; random number between 1 and bx. result in dx
 ; high bit set ----------------------------------------------------------------
 retry_msg db '! press r to retr', 0xF9 		; y
 hit_msg db 'You hit', 0xA0 					; space
-self_msg db 'yoursel', 0xE6 				; f
 wall_msg db 'the wal', 0xEC 				; l
 score_msg db 'Score:', 0xA0 				; space
 instructions db ' Use W (up) A (left) S(down) D(right) to control', 0xA0 ; space
