@@ -24,6 +24,13 @@
 	int		0x16
 	;jmp game_start_screen							
 
+;game_start_screen:
+;	call	clear_screen
+;	call	print_string
+;	mov		si, start_msg
+;	call	print_string
+;	jmp wait_for_r
+
 game_loop:
 	call	clear_screen					; clear the screen
 	push	word [snake_pos] 				; save snake head position for later
@@ -154,7 +161,7 @@ apple_collision:
 	inc		word [score]					; if we were on an apple, increment score by one
 	mov		ax, [score]
 	cmp		ax, 15
-	je		game_win	
+	je		game_over_win	
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
@@ -198,27 +205,20 @@ game_loop_continued:
 	int		0x15							; Sleep
 	jmp		game_loop						; loop
 
-
+game_over_win:
+	push	win_msg
+	jmp		game_over
 
 game_over_hit_wall:
 	push	wall_msg
-    
+
 game_over:
 	call	clear_screen
+	pop si
 	call	print_string
 	mov		si, retry_msg
 	call	print_string
-game_win:
-	call 	clear_screen
-	mov		si, win_msg
-	call 	print_string
 
-game_start_screen:
-	call	clear_screen
-	call	print_string
-	mov		si, start_msg
-	call	print_string
-	jmp wait_for_r
 wait_for_r:
 	mov		ah, 0x00
 	int		0x16
@@ -293,8 +293,7 @@ rand:										; random number between 1 and bx. result in dx
 ; MESSAGES (Encoded as 7-bit strings. Last byte is an ascii value with its
 ; high bit set ----------------------------------------------------------------
 retry_msg db '! press r to retr', 0xF9 		; y
-hit_msg db 'You hit', 0xA0 					; space
-wall_msg db 'the wal', 0xEC 				; l
+wall_msg db 'you hit the wall!', 0xEC 				; l
 score_msg db 'Score:', 0xA0 				; space
 instructions db ' Use W (up) A (left) S(down) D(right) to control', 0xA0 ; space
 start_msg db 'Welcome to Apple eater! Press R to start', 0xA0; space
@@ -312,3 +311,5 @@ snake_pos:
 	snake_x_pos db 0x0F
 	snake_y_pos db 0x0F
     snake_body_pos dw 0x0000
+
+times 2048 - ($-$$) db 0
