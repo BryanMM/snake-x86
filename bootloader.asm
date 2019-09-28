@@ -12,25 +12,25 @@
 ;                                                            ;
 ;************************************************************;
 
-; Bootloader basado en: http://mikeos.sourceforge.net/write-your-own-os.html ;
+; Bootloader basado en: http://mikeos.sourceforge.net/write-your-own-os.html ;  				
 
-	bits 16						
-	org 0x7C00  				
+bits 16							; Define to nasm that we are running in real mode
+org 0x7C00  					; Physical address of the bootloader
 
 init:
 	mov ax, 1000h				; Set up 4K stack space after this bootloader
 	add ax, 288					; (4096 + 512) / 16 bytes per paragraph
 	mov ss, ax
-	mov sp, 0x1000				; 4k of stack space.
+	mov sp, 0x1000				; 8k of stack space.
 
-	mov ax, 1000h				; Set data segment to where we're loaded
+	mov ax, 07C0h				; Set data segment to where we're loaded
 	mov ds, ax
 
 	xor ax, ax   				; Reset AX
 	int 0x13
 	jc init        				; If failed, re-run init again
 
-	mov ax, 1000h				; When we read the sector, reads from address 0x1000
+	mov ax, 0x1000				; When we read the sector, reads from address 0x1000
 	mov es,ax     				; Set ES with 0x1000
 
 prepare_game:					; Set up to read the second stage (the game)
