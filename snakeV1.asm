@@ -1,16 +1,16 @@
-/**************************************************************/
-/*		     Instituto Tecnológico de Costa Rica	          */
-/*		Área Académica de Ingeniería en Computadores          */
-/*            Principios de Sistemas Operativos               */
-/*                        Tarea 2                             */
-/*                                                            */
-/* Prof. Jason Leitón Jiménez								  */
-/* Integrantes:              								  */
-/*   - Bryan Alexander Masis Mora	    					  */
-/*   - Cristofer Alberto Fernández Fernández				  */
-/*   - María Alejandra Castrillo Muñoz    					  */
-/*                                                            */
-/**************************************************************/
+;************************************************************;
+;		     Instituto Tecnológico de Costa Rica	         ;
+;		Área Académica de Ingeniería en Computadores         ;
+;            Principios de Sistemas Operativos               ;
+;                        Tarea 2                             ;
+;                                                            ;
+; Prof. Jason Leitón Jiménez								 ;
+; Integrantes:              								 ;
+;   - Bryan Alexander Masis Mora	    					 ;
+;   - Cristofer Alberto Fernández Fernández				  	 ;
+;   - María Alejandra Castrillo Muñoz    					 ;
+;                                                            ;
+;************************************************************;
 
     bits 16								;16 bits mode
     org 0x0000

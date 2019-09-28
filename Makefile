@@ -1,5 +1,5 @@
 USB=dev/sdb
-VERSION=V1
+VERSION=V2
 
 build:snake.img
 
