@@ -22,6 +22,9 @@
 	mov		ax, 0x0305
 	mov		bx, 0x031F
 	int		0x16
+	mov 	bh, [game_start_flag]
+	cmp 	bh, 3
+	je 		game_start_screen
 									
 
 game_loop:
@@ -205,7 +208,7 @@ game_start_screen:
 	call	clear_screen
 	mov		si, start_msg
 	call	print_string
-	mov		byte [game_start_flag], 1
+	mov		byte [game_start_flag], 4
 	jmp wait_for_r
 
 game_over_win:
@@ -310,7 +313,7 @@ lemon_pos dw 0x0D2D
 score dw 1
 last_move db 'd'
 win_score db '15'
-game_start_flag db 00
+game_start_flag db 3
 snake_pos:
 	snake_x_pos db 0x0F
 	snake_y_pos db 0x0F
