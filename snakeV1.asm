@@ -228,12 +228,6 @@ game_over:
 	mov		si, retry_msg
 	call	print_string
 
-hot_restart:
-	mov		word [snake_pos], 0x0F0F
-	and		word [snake_body_pos], 0
-	and		word [score], 0
-	mov		byte [last_move], 'd'
-	jmp		game_loop
 wait_for_r:
 	mov		ah, 0x00
 	int		0x16
@@ -244,7 +238,12 @@ wait_for_r:
 	and		word [score], 0
 	mov		byte [last_move], 'd'
 	jmp		game_loop
-
+hot_restart:
+	mov		word [snake_pos], 0x0F0F
+	and		word [snake_body_pos], 0
+	and		word [score], 0
+	mov		byte [last_move], 'd'
+	jmp		game_loop
 ; SCREEN FUNCTIONS ------------------------------------------------------------
 clear_screen:
 	mov		ax, 0x0700						; clear entire window (ah 0x07, al 0x00)
