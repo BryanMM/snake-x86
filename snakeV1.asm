@@ -22,14 +22,7 @@
 	mov		ax, 0x0305
 	mov		bx, 0x031F
 	int		0x16
-	;jmp game_start_screen							
-
-;game_start_screen:
-;	call	clear_screen
-;	call	print_string
-;	mov		si, start_msg
-;	call	print_string
-;	jmp wait_for_r
+									
 
 game_loop:
 	call	clear_screen					; clear the screen
@@ -176,6 +169,9 @@ lemon_collision:
 	inc		word [score]					; if we were on an apple, increment score three times
 	inc		word [score]
 	inc		word [score]
+	mov		ax, [score]
+	cmp		ax, 15
+	je		game_over_win
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
@@ -196,7 +192,7 @@ orange_collision:
 	pop		cx								; restore old random into cx
 	mov		dh, cl							; move old value into high bits of new
 	mov		[orange_pos], dx				; save the position of the new random food
-	mov		byte [grow_snake_flag], 1 		; make sure snake grows
+	mov		byte [grow_snake_flag], 3 		; make sure snake doesnt grows
 	ret 
 game_loop_continued:
 	mov		cx, 0x0002						; Sleep for 0,15 seconds (cx:dx)
@@ -204,6 +200,13 @@ game_loop_continued:
 	mov		ah, 0x86
 	int		0x15							; Sleep
 	jmp		game_loop						; loop
+
+game_start_screen:
+	call	clear_screen
+	mov		si, start_msg
+	call	print_string
+	mov		byte [game_start_flag], 1
+	jmp wait_for_r
 
 game_over_win:
 	push	win_msg
@@ -307,6 +310,7 @@ lemon_pos dw 0x0D2D
 score dw 1
 last_move db 'd'
 win_score db '15'
+game_start_flag db 00
 snake_pos:
 	snake_x_pos db 0x0F
 	snake_y_pos db 0x0F
