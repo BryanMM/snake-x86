@@ -1,16 +1,16 @@
-;************************************************************;
-;		     Instituto Tecnológico de Costa Rica	         ;
-;		Área Académica de Ingeniería en Computadores         ;
-;            Principios de Sistemas Operativos               ;
-;                        Tarea 2                             ;
-;                                                            ;
-; Prof. Jason Leitón Jiménez								 ;
-; Integrantes:              								 ;
-;   - Bryan Alexander Masis Mora	    					 ;
-;   - Cristofer Alberto Fernández Fernández				  	 ;
-;   - María Alejandra Castrillo Muñoz    					 ;
-;                                                            ;
-;************************************************************;
+;*******************************************************************************************************;
+;		     Instituto Tecnológico de Costa Rica	         											;
+;		Área Académica de Ingeniería en Computadores         											;
+;            Principios de Sistemas Operativos               											;
+;                        Tarea 2                            											;
+;                                                            											;
+; Prof. Jason Leitón Jiménez								 											;
+; Integrantes:              								 											;
+;   - Bryan Alexander Masis Mora	    					 											;
+;   - Cristofer Alberto Fernández Fernández				  	 											;
+;   - María Alejandra Castrillo Muñoz    					 											;
+;Basado en el codigo encontrado en https://gitlab.com/pmikkelsen/asm_snake/blob/master/snake.asm#L126	;                                                            ;
+;*******************************************************************************************************;
  
     bits 16								;16 bits mode
     org 0x0000
@@ -67,11 +67,17 @@ update_body:
 	mov		ax, bx							; save bx into ax for next loop
 	jmp		update_body						; loop
 done_update:
-	cmp		byte [grow_snake_flag], 1 		; snake should grow?
+	cmp		byte [grow_snake_flag], 2 		; snake should grow?
 	jne		add_zero_snake					; if not: jump to add_zero_snake
 	mov		word [si], ax					; save the last element at the next position
 	mov		byte [grow_snake_flag], 0 		; disable grow_snake_flag
 	add		si, 2							; increment si by 2
+	cmp		byte [grow_snake_flag], 10
+	jne		add_zero_snake
+	mov 	word [si], ax
+	add		si, 2
+	add		si, 2
+	mov 	byte [grow_snake_flag], 0
 add_zero_snake:
 	mov		word [si], 0x0000
 print_stuff:
@@ -83,13 +89,21 @@ print_stuff:
 	call	print_int						; print it
     mov 	si, instructions				; move the instructins into si
     call 	print_string 					; print it
-	mov		dx, [food_pos] 					; set dx to the food position
+	mov		dx, [apple_pos] 				; set dx to the food position
 	call	move_cursor						; move cursor there
-	mov		al, '*'							; use '*' as food symbol
+	mov		al, 'M'
+	call	print_char	
+	mov		dx, [orange_pos] 			; set dx to the food position
+	call	move_cursor						; move cursor there
+	mov		al, 'O'							; use 'P' as pineaple  symbol
 	call	print_char						; print food
+	mov 	dx, [lemon_pos]
+	call 	move_cursor
+	mov 	al, 'L'
+	call 	print_char
 	mov		dx, [snake_pos]					; set dx to the snake head position
 	call	move_cursor						; move there
-	mov		al, '@'							; use '@' as snake head symbol
+	mov		al, '@'							; use '>' as snake head symbol
 	call	print_char						; print it
 	mov		si, snake_body_pos 				; prepare to print snake body
 snake_body_print_loop:
@@ -98,7 +112,7 @@ snake_body_print_loop:
 	jz		check_collisions 				; if it was zero, move out of here
 	mov		dx, ax							; if not, move the position into dx
 	call	move_cursor						; move the cursor there
-	mov		al, 'o'							; use 'o' as the snake body symbol
+	mov		al, '-'							; use '-' as the snake body symbol
 	call	print_char						; print it
 	jmp		snake_body_print_loop 			; loop
 
@@ -112,7 +126,7 @@ check_collisions:
 	jge		game_over_hit_wall 				; if yes, jump
 	cmp		bl, 0							; check if we are too far to the left
 	jl		game_over_hit_wall 				; if yes, jump
-	mov		si, snake_body_pos 				; prepare to check for self-collision
+	mov		si, snake_body_pos 				
 move_snake:
 	lodsw									; load position of snake body, and increment si
 	cmp		ax, bx							; check if head position = body position
@@ -120,9 +134,15 @@ move_snake:
 	jne		move_snake 						; if not, loop
 no_collision:
 	mov		ax, [snake_pos]					; load snake head position into ax
-	cmp		ax, [food_pos]					; check if we are on the food
-	jne		game_loop_continued 			; jump if snake didn't hit food
-	inc		word [score]					; if we were on food, increment score
+	cmp		ax, [apple_pos]					; check if we are on the apple
+	je		apple_collision
+	cmp 	ax, [lemon_pos]
+	je		lemon_collision
+	cmp		ax, [orange_pos]
+	je 		orange_collision
+	jmp		game_loop_continued 			; if no, then we continue
+apple_collision:
+	inc		word [score]					; if we were on an apple, increment score by one
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
@@ -130,8 +150,33 @@ no_collision:
 	call	rand							; generate random value
 	pop		cx								; restore old random into cx
 	mov		dh, cl							; move old value into high bits of new
-	mov		[food_pos], dx					; save the position of the new random food
-	mov		byte [grow_snake_flag], 1 		; make sure snake grows
+	mov		[apple_pos], dx					; save the position of the new random food
+	mov		byte [grow_snake_flag], 2 		; make sure snake grows
+	ret
+lemon_collision:
+	inc		word [score]					; if we were on an apple, increment score by one
+	mov		bx, 24							; set max value for random call (y-val - 1)
+	call	rand							; generate random value
+	push	dx								; save it on the stack
+	mov		bx, 78 							; set max value for random call
+	call	rand							; generate random value
+	pop		cx								; restore old random into cx
+	mov		dh, cl							; move old value into high bits of new
+	mov		[lemon_pos], dx					; save the position of the new random food
+	mov		byte [grow_snake_flag], 10 		; make sure snake grows
+	ret
+orange_collision:
+	dec		word [score]					; if we were on an apple, increment score by one
+	mov		bx, 24							; set max value for random call (y-val - 1)
+	call	rand							; generate random value
+	push	dx								; save it on the stack
+	mov		bx, 78 							; set max value for random call
+	call	rand							; generate random value
+	pop		cx								; restore old random into cx
+	mov		dh, cl							; move old value into high bits of new
+	mov		[orange_pos], dx				; save the position of the new random food
+	mov		byte [grow_snake_flag], -1 		; make sure snake grows
+	ret 
 game_loop_continued:
 	mov		cx, 0x0002						; Sleep for 0,15 seconds (cx:dx)
 	mov		dx, 0x49F0						; 0x000249F0 = 150000
@@ -229,8 +274,10 @@ instructions db ' Use W (up) A (left) S(down) D(right) to control', 0xA0 ; space
 
 
 ; VARIABLES -------------------------------------------------------------------
-grow_snake_flag db 0
-food_pos dw 0x0D0D
+grow_snake_flag db 00
+apple_pos dw 0x0D0D
+orange_pos dw 0x0D1D
+lemon_pos dw 0x0D2D
 score dw 1
 last_move db 'd'
 snake_pos:
