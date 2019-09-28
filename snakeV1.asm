@@ -319,4 +319,4 @@ snake_pos:
 	snake_y_pos db 0x0F
     snake_body_pos dw 0x0000
 
-times 2048 - ($-$$) db 0
+
