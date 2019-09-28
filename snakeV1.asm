@@ -157,7 +157,7 @@ apple_collision:
 	inc		word [score]					; if we were on an apple, increment score by one
 	mov		ax, [score]
 	cmp		ax, 15
-	je		game_over_win	
+	jge		game_over_win	
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
@@ -174,7 +174,7 @@ lemon_collision:
 	inc		word [score]
 	mov		ax, [score]
 	cmp		ax, 15
-	je		game_over_win
+	jge		game_over_win
 	mov		bx, 24							; set max value for random call (y-val - 1)
 	call	rand							; generate random value
 	push	dx								; save it on the stack
